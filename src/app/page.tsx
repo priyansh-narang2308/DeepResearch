@@ -1,3 +1,4 @@
+import QuestionAnswerBox from "@/components/deep-research/question-answer-box";
 import UserInput from "@/components/deep-research/user-input";
 
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
       </div>
 
       <UserInput />
+      <QuestionAnswerBox/>
     </main>
   );
 }

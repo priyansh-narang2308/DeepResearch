@@ -13,27 +13,37 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useDeepResearchStore } from "@/store/deepResearchStore";
+import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   input: z.string().min(2, "Please enter at least 2 characters").max(200),
 });
 
 const UserInput = () => {
+  const { setQuestions, setTopic, isLoading, setIsLoading } =
+    useDeepResearchStore();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { input: "" },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
     try {
+      setTopic(values.input);
       const response = await fetch("/api/generate-questions", {
         method: "POST",
         body: JSON.stringify({ topic: values.input }),
       });
       const data = await response.json();
+      setQuestions(data);
       console.log(data);
-    } catch (error) { 
+    } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -60,10 +70,17 @@ const UserInput = () => {
           )}
         />
         <Button
+          disabled={isLoading}
           type="submit"
           className="rounded-full px-8 py-5 text-base sm:text-lg font-medium shadow-md hover:shadow-lg transition-all w-full sm:w-auto cursor-pointer"
         >
-          Submit
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...
+            </>
+          ) : (
+            "Submit"
+          )}
         </Button>
       </form>
     </Form>
