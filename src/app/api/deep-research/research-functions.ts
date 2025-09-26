@@ -2,6 +2,7 @@ import { ResearchState, SearchResults } from "./types";
 import z from "zod";
 import { callModel } from "./model-caller";
 import { getPlanningPrompt, PLANNING_SYSTEM_PROMPT } from "./prompts";
+import { exa } from "./services";
 
 export async function generateSearchQueries(researchState: ResearchState) {
   const results = await callModel(
@@ -27,4 +28,27 @@ export async function generateSearchQueries(researchState: ResearchState) {
 export async function search(
   query: string,
   researchState: ResearchState
-): Promise<SearchResults> {}
+): Promise<SearchResults[]> {
+  try {
+    const searchResults = await exa.searchAndContents(query, {
+      type: "keyword",
+      numResults: 3,
+      startPublishedDate: new Date(
+        Date.now() - 365 * 24 * 60 * 60 * 1000
+      ).toISOString(), //this gives from past 1 year content
+      endPublishedDate: new Date().toISOString(),
+      excludeDomains: ["https://www.youtube.com"],
+      livecrawl: "never",
+      text: {
+        maxCharacters: 20000,
+      },
+    });
+
+    const fileteredResults=searchResults.results.filter
+
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+}
+
+1:51:59
