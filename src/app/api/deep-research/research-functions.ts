@@ -1,7 +1,12 @@
-import { ResearchState, SearchResults } from "./types";
+import { ResearchFindings, ResearchState, SearchResults } from "./types";
 import z from "zod";
 import { callModel } from "./model-caller";
-import { getPlanningPrompt, PLANNING_SYSTEM_PROMPT } from "./prompts";
+import {
+  EXTRACTION_SYSTEM_PROMPT,
+  getExtractionPrompt,
+  getPlanningPrompt,
+  PLANNING_SYSTEM_PROMPT,
+} from "./prompts";
 import { exa } from "./services";
 
 export async function generateSearchQueries(researchState: ResearchState) {
@@ -60,4 +65,61 @@ export async function search(
     console.log("Error: ", error);
     return [];
   }
+}
+
+export async function extractContent(
+  content: string,
+  url: string,
+  researchState: ResearchState
+) {
+  const callingResylt = await callModel(
+    {
+      model: "mistralai/mistral-small-3.2-24b-instruct:free",
+      prompt: getExtractionPrompt(
+        content,
+        researchState.topic,
+        researchState.clarificationsText
+      ),
+      system: EXTRACTION_SYSTEM_PROMPT,
+      schema: z.object({
+        summary: z.string().describe("A comprehensive summary of the content"),
+      }),
+    },
+    researchState
+  );
+
+  return {
+    url,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    summary: (callingResylt as any).summary,
+  };
+}
+
+export async function processSearchResults(
+  searchResults: SearchResults[],
+  researchState: ResearchState
+): Promise<ResearchFindings[]> {
+  const extractionPromises = searchResults.map((result) =>
+    extractContent(result.content, result.url, researchState)
+  );
+  const extractionResults = await Promise.allSettled(extractionPromises);
+
+  type ExtractionResult = { url: string; summary: string };
+
+  const newFindings = extractionResults
+    .filter(
+      (result): result is PromiseFulfilledResult<ExtractionResult> =>
+        result.status === "fulfilled" &&
+        result.value !== null &&
+        result.value !== undefined
+    )
+    .map((result) => {
+      const { summary, url } = result.value;
+      return {
+        summary,
+        source: url,
+      };
+    });
+
+  return newFindings;
 }
