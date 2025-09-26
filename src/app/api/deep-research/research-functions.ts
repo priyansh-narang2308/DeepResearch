@@ -37,7 +37,7 @@ export async function search(
   try {
     const searchResults = await exa.searchAndContents(query, {
       type: "keyword",
-      numResults: 1,
+      numResults: 3,
       startPublishedDate: new Date(
         Date.now() - 365 * 24 * 60 * 60 * 1000
       ).toISOString(), //this gives from past 1 year content
