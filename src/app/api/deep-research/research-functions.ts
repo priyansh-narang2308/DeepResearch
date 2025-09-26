@@ -37,7 +37,7 @@ export async function search(
   try {
     const searchResults = await exa.searchAndContents(query, {
       type: "keyword",
-      numResults: 3,
+      numResults: 1,
       startPublishedDate: new Date(
         Date.now() - 365 * 24 * 60 * 60 * 1000
       ).toISOString(), //this gives from past 1 year content
@@ -99,6 +99,7 @@ export async function processSearchResults(
   searchResults: SearchResults[],
   researchState: ResearchState
 ): Promise<ResearchFindings[]> {
+  // Same as hthe planning part of the search queries
   const extractionPromises = searchResults.map((result) =>
     extractContent(result.content, result.url, researchState)
   );

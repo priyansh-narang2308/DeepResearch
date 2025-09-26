@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { generateSearchQueries, search } from "./research-functions";
+import {
+  generateSearchQueries,
+  processSearchResults,
+  search,
+} from "./research-functions";
 import { ResearchState } from "./types";
 
 export async function deepResearch(researchState: ResearchState) {
@@ -20,14 +24,20 @@ export async function deepResearch(researchState: ResearchState) {
     const allSearchResults = searchResultsResponses
       .filter(
         (result): result is PromiseFulfilledResult<any> =>
-          result.status === "fulfilled" && Array.isArray(result.value) && result.value.length > 0
+          result.status === "fulfilled" &&
+          Array.isArray(result.value) &&
+          result.value.length > 0
       )
       .map((result) => result.value)
       .flat();
 
-    console.log(allSearchResults);
+    // Now process the search results that we got
+    const newFindings = await processSearchResults(
+      allSearchResults,
+      researchState
+    );
 
-    // Now proc4ess the search results that we got 
+    console.log(newFindings);
 
     // to stop the loop make it an empty array!
     currentQueries = [];
