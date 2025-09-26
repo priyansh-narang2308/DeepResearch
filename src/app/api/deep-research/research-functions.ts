@@ -2,17 +2,26 @@ import { ResearchFindings, ResearchState, SearchResults } from "./types";
 import z from "zod";
 import { callModel } from "./model-caller";
 import {
+  ANALYSIS_SYSTEM_PROMPT,
   EXTRACTION_SYSTEM_PROMPT,
+  getAnalysisPrompt,
   getExtractionPrompt,
   getPlanningPrompt,
   PLANNING_SYSTEM_PROMPT,
 } from "./prompts";
 import { exa } from "./services";
+import { combineFindings } from "./utils";
+import {
+  MAX_CONTENT_CHARS,
+  MAX_ITERATIONS,
+  MAX_SEARCH_RESULTS,
+  MODELS,
+} from "./constants";
 
 export async function generateSearchQueries(researchState: ResearchState) {
   const results = await callModel(
     {
-      model: "mistralai/mistral-small-3.2-24b-instruct:free",
+      model: MODELS.PLANNING,
       prompt: getPlanningPrompt(
         researchState.topic,
         researchState.clarificationsText
@@ -37,7 +46,7 @@ export async function search(
   try {
     const searchResults = await exa.searchAndContents(query, {
       type: "keyword",
-      numResults: 3,
+      numResults: MAX_SEARCH_RESULTS,
       startPublishedDate: new Date(
         Date.now() - 365 * 24 * 60 * 60 * 1000
       ).toISOString(), //this gives from past 1 year content
@@ -45,7 +54,7 @@ export async function search(
       excludeDomains: ["https://www.youtube.com"],
       livecrawl: "never",
       text: {
-        maxCharacters: 20000,
+        maxCharacters: MAX_CONTENT_CHARS,
       },
     });
 
@@ -74,7 +83,7 @@ export async function extractContent(
 ) {
   const callingResylt = await callModel(
     {
-      model: "mistralai/mistral-small-3.2-24b-instruct:free",
+      model: MODELS.EXTRACTION,
       prompt: getExtractionPrompt(
         content,
         researchState.topic,
@@ -130,13 +139,26 @@ export async function analyzeeFindings(
   currentQueries: string[],
   currentIteration: number
 ) {
-
   try {
-    
     // extract all theo content from the findings
-    const contentText=findings
-
+    const contentText = combineFindings(researchState.findings);
+    const resultAnalyssis = await callModel(
+      {
+        model: MODELS.ANALYSIS,
+        prompt: getAnalysisPrompt(
+          contentText,
+          researchState.topic,
+          researchState.clarificationsText,
+          currentQueries,
+          currentIteration,
+          MAX_ITERATIONS,
+          contentText.length
+        ),
+        system: ANALYSIS_SYSTEM_PROMPT,
+      },
+      researchState
+    );
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 }
