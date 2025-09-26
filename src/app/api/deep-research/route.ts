@@ -1,5 +1,6 @@
 import { createUIMessageStream, createUIMessageStreamResponse } from "ai";
 import { ResearchState } from "./types";
+import { deepResearch } from "./main";
 
 export async function POST(req: Request) {
   try {
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
 
     return createUIMessageStreamResponse({
       stream: createUIMessageStream({
-        execute: ({ writer }) => {
+        execute: async ({ writer }) => {
           // writer.write({
           //   type: "text-delta",
           //   delta: "Hello",
@@ -48,6 +49,8 @@ export async function POST(req: Request) {
             processedUrl: new Set(), //prevents the duplications of the URL
             clarificationsText: JSON.stringify(clarifications),
           };
+
+          await deepResearch(researchState, writer);
         },
       }),
     });

@@ -93,7 +93,7 @@ Remember the current year is ${new Date().getFullYear()}.
 
 You need to find the most relevant content on the given topic. Based on the given topic and clarifications you need to generate the right search queries that can be used to cover the topic and find the most relevant content which can be used to write the comprehensive report. Create diverse queries that target different aspects of the topic.
 
-You need to generate the search queries in a way that can be used to find the most relevant content which can be used to write the comprehensive report.
+You need to generate around 3 (maximum of 3) search queries in a way that can be used to find the most relevant content which can be used to write the comprehensive report.
 `;
 export const getPlanningPrompt = (topic: string, clarificationsText: string) =>
   `Here is the topic: <topic>${topic}</topic> and

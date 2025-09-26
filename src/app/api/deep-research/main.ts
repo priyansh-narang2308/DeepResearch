@@ -7,4 +7,8 @@ export async function deepResearch(
   dataStream: any
 ) {
   const initlialQueries = await generateSearchQueries(researchState);
+
+  console.log(initlialQueries);
+
+  return initlialQueries;
 }
