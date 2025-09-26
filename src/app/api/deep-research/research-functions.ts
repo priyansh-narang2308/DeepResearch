@@ -142,7 +142,7 @@ export async function analyzeeFindings(
   try {
     // extract all theo content from the findings
     const contentText = combineFindings(researchState.findings);
-    const resultAnalyssis = await callModel(
+    const resultAnalysis = await callModel(
       {
         model: MODELS.ANALYSIS,
         prompt: getAnalysisPrompt(
@@ -155,9 +155,24 @@ export async function analyzeeFindings(
           contentText.length
         ),
         system: ANALYSIS_SYSTEM_PROMPT,
+        schema: z.object({
+          sufficient: z
+            .boolean()
+            .describe(
+              "Whether the collected content is sufficient for a usefull report!"
+            ),
+          gaps: z.array(z.string()).describe("Identified gaps in the content"),
+          queries: z
+            .array(z.string())
+            .describe(
+              "Search queries for missing information. Max 3 queries."
+            ),
+        }),
       },
       researchState
     );
+
+    return resultAnalysis;
   } catch (error) {
     console.log(error);
   }
