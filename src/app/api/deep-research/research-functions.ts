@@ -1,4 +1,4 @@
-import { ResearchState } from "./types";
+import { ResearchState, SearchResults } from "./types";
 import z from "zod";
 import { callModel } from "./model-caller";
 import { getPlanningPrompt, PLANNING_SYSTEM_PROMPT } from "./prompts";
@@ -23,3 +23,8 @@ export async function generateSearchQueries(researchState: ResearchState) {
 
   return results;
 }
+
+export async function search(
+  query: string,
+  researchState: ResearchState
+): Promise<SearchResults> {}

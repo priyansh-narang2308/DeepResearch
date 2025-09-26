@@ -21,3 +21,8 @@ export interface ModalCallOptions<T> {
   schema?: z.ZodType<T>;
 }
 
+export interface SearchResults {
+  title: string;
+  url: string;
+  content: string;
+}
