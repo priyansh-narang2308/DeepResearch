@@ -38,7 +38,7 @@ export async function deepResearch(researchState: ResearchState) {
     );
 
     // using spread operator for the storing of hthe research state findings
-    researchState.findings=[...researchState.findings,...newFindings]
+    researchState.findings = [...researchState.findings, ...newFindings];
 
     console.log(newFindings);
 

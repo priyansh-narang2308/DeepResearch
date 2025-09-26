@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description:
     "An intelligent system that generates follow-up questions, crafts optimal search queries, and compiles comprehensive research reports.",
     icons:{
-      icon:"/logo.png"
+      icon:"/log.png"
     }
 };
 

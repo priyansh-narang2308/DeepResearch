@@ -124,3 +124,19 @@ export async function processSearchResults(
 
   return newFindings;
 }
+
+export async function analyzeeFindings(
+  researchState: ResearchState,
+  currentQueries: string[],
+  currentIteration: number
+) {
+
+  try {
+    
+    // extract all theo content from the findings
+    const contentText=findings
+
+  } catch (error) {
+    console.log(error)
+  }
+}
