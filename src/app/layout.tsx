@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   title: "Deep Research",
   description:
     "An intelligent system that generates follow-up questions, crafts optimal search queries, and compiles comprehensive research reports.",
+    icons:{
+      icon:"/logo.png"
+    }
 };
 
 export default function RootLayout({

@@ -44,11 +44,20 @@ export async function search(
       },
     });
 
-    const fileteredResults=searchResults.results.filter
+    const fileteredResults = searchResults.results
+      // extract the title and url and content from the particualr reponse
+      .filter((r) => r.title && r.text !== undefined)
+      .map((r) => ({
+        title: r.title || "",
+        url: r.url || "",
+        content: r.text || "",
+      }));
 
+    researchState.completedSteps++;
+
+    return fileteredResults;
   } catch (error) {
     console.log("Error: ", error);
+    return [];
   }
 }
-
-1:51:59
